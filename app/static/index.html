@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANCHOR — Career Sustainability Copilot</title>
+<style>
+  
+
+  :root{
+    --bg: #FAF9F6;
+    --navy: #0D1B2A;
+    --accent: #1A7A5E;
+    --accent-light: #E8F5F0;
+    --border: #E0DDD6;
+    --card: #FFFFFF;
+    --text-muted: #5B6470;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+    --shadow-soft: 0 4px 24px rgba(13, 27, 42, 0.06);
+    --shadow-lift: 0 12px 32px rgba(13, 27, 42, 0.10);
+    --font-display: 'Cormorant Garamond', Georgia, 'Palatino Linotype', Palatino, serif;
+    --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0; padding:0;
+    background: var(--bg);
+    color: var(--navy);
+    font-family: var(--font-body);
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  a{ color: inherit; }
+  button{ font-family: inherit; cursor: pointer; }
+  :focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  
+  .app{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  
+  header.top-bar{
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(250, 249, 246, 0.86);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .top-bar-inner{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .brand{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .brand-icon{
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(155deg, var(--navy), #16324a);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    box-shadow: var(--shadow-soft);
+    flex-shrink: 0;
+  }
+  .brand-text h1{
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+  .brand-text p{
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+  }
+  nav.top-actions{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn{
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--navy);
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all .18s ease;
+    white-space: nowrap;
+  }
+  .btn:hover{
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-soft);
+  }
+  .btn-primary{
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+  .btn-primary:hover{
+    background: #16324a;
+    color: #fff;
+    box-shadow: var(--shadow-lift);
+  }
+  .btn-ghost{
+    background: transparent;
+    border-color: transparent;
+    color: var(--text-muted);
+  }
+  .btn-ghost:hover{
+    color: var(--navy);
+    background: var(--accent-light);
+  }
+
+  .icon-menu-toggle{
+    display: none;
+    border: 1px solid var(--border);
+    background: var(--card);
+    border-radius: 10px;
+    width: 40px; height: 40px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------------- Hero / Welcome ---------------- */
+  .hero{
+    max-width: 880px;
+    margin: 56px auto 40px;
+    padding: 0 28px;
+    text-align: center;
+  }
+  .hero-anchor{
+    font-size: 40px;
+    display: inline-block;
+    margin-bottom: 6px;
+    animation: dropIn 0.7s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .hero h2{
+    font-family: var(--font-display);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 600;
+    margin: 6px 0 14px;
+    letter-spacing: 0.01em;
+    color: var(--navy);
+  }
+  .hero h2 em{
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero p.sub{
+    font-size: 16.5px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  @keyframes dropIn{
+    from{ opacity: 0; transform: translateY(-14px) scale(0.9); }
+    to{ opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+
+  .chip-row{
+    max-width: 980px;
+    margin: 0 auto 44px;
+    padding: 0 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .chip{
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--navy);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: all .2s ease;
+    animation: fadeUp .5s ease both;
+  }
+  .chip:hover{
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  @keyframes fadeUp{
+    from{ opacity: 0; transform: translateY(8px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+ 
+  main.chat-shell{
+    flex: 1;
+    width: 100%;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 28px 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .chat-window{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 8px 4px 20px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  .chat-window::-webkit-scrollbar{ width: 8px; }
+  .chat-window::-webkit-scrollbar-thumb{ background: var(--border); border-radius: 8px; }
+
+  .msg-row{
+    display: flex;
+    animation: msgIn .35s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes msgIn{
+    from{ opacity: 0; transform: translateY(10px); }
+    to{ opacity: 1; transform: translateY(0); }
+  }
+  .msg-row.user{ justify-content: flex-end; }
+  .msg-row.assistant{ justify-content: flex-start; }
+
+  .bubble{
+    max-width: 78%;
+    padding: 16px 20px;
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .bubble.user{
+    background: var(--navy);
+    color: #F4F1EA;
+    border-radius: var(--radius-md) var(--radius-md) 4px var(--radius-md);
+    box-shadow: var(--shadow-soft);
+  }
+  .bubble.assistant{
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--navy);
+    border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 4px;
+    box-shadow: var(--shadow-soft);
+    width: 100%;
+    max-width: 82%;
+  }
+
+  .agent-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  .agent-badge.escalation{
+    background: #FBEAEA;
+    color: #B3413A;
+  }
+  .agent-badge .dot{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .bubble-text{ white-space: pre-wrap; word-wrap: break-word; }
+
+  .source-row{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .source-label{
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    width: 100%;
+    margin-bottom: 2px;
+  }
+  .source-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    color: var(--navy);
+    transition: all .18s ease;
+  }
+  .source-badge:hover{
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  /* Thinking indicator */
+  .thinking-row{ display: flex; justify-content: flex-start; }
+  .thinking-bubble{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 14px 20px;
+    border-radius: var(--radius-md) var(--radius-md) var(--radius-md) 4px;
+    box-shadow: var(--shadow-soft);
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .dots{ display: flex; gap: 4px; }
+  .dots span{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: bounce 1.2s infinite ease-in-out both;
+  }
+  .dots span:nth-child(1){ animation-delay: -0.24s; }
+  .dots span:nth-child(2){ animation-delay: -0.12s; }
+  @keyframes bounce{
+    0%, 80%, 100%{ transform: scale(0.6); opacity: 0.5; }
+    40%{ transform: scale(1); opacity: 1; }
+  }
+
+  /* Empty state */
+  .empty-state{
+    margin: auto;
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 20px;
+  }
+  .empty-state .icon{ font-size: 30px; margin-bottom: 10px; opacity: 0.6; }
+  .empty-state p{ font-size: 14px; margin: 0; }
+
+  
+  .input-bar{
+    position: sticky;
+    bottom: 0;
+    padding: 14px 0 4px;
+    background: linear-gradient(180deg, rgba(250,249,246,0) 0%, var(--bg) 32%);
+  }
+  .input-shell{
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 8px 8px 8px 20px;
+    box-shadow: var(--shadow-lift);
+    transition: border-color .2s ease;
+  }
+  .input-shell:focus-within{
+    border-color: var(--accent);
+  }
+  #chat-input{
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 15px;
+    color: var(--navy);
+    line-height: 1.5;
+    padding: 10px 0;
+    max-height: 140px;
+  }
+  #chat-input::placeholder{ color: #9AA3AD; }
+
+  .send-btn{
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    transition: all .18s ease;
+  }
+  .send-btn:hover:not(:disabled){
+    background: var(--accent);
+    transform: scale(1.05);
+  }
+  .send-btn:disabled{
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .input-hint{
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* ---------------- Footer ---------------- */
+  footer.app-footer{
+    border-top: 1px solid var(--border);
+    padding: 18px 28px 22px;
+  }
+  .footer-inner{
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .footer-label{
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-right: 6px;
+  }
+  .power-pill{
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--navy);
+    background: var(--accent-light);
+    padding: 5px 12px;
+    border-radius: 999px;
+  }
+
+  /* ---------------- Responsive ---------------- */
+  @media (max-width: 780px){
+    nav.top-actions .btn:not(.btn-primary){ display: none; }
+    .icon-menu-toggle{ display: flex; }
+    .bubble, .bubble.assistant{ max-width: 90%; }
+  }
+  @media (max-width: 520px){
+    .top-bar-inner{ padding: 12px 16px; }
+    .hero{ margin: 36px auto 28px; padding: 0 18px; }
+    .chat-shell{ padding: 0 14px 16px; }
+    .brand-text p{ display: none; }
+    .btn-primary{ padding: 9px 14px; font-size: 12.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand">
+        <div class="brand-icon">⚓</div>
+        <div class="brand-text">
+          <h1>ANCHOR</h1>
+          <p>Enterprise Multi-Agent AI Assistant</p>
+        </div>
+      </div>
+      <nav class="top-actions" aria-label="Primary">
+        <button class="btn btn-ghost" type="button">About</button>
+        <button class="btn btn-ghost" type="button">Documentation</button>
+        <button class="btn btn-ghost" type="button">GitHub</button>
+        <button class="btn btn-ghost" id="new-chat-btn" type="button">+ New Chat</button>
+        <a href="/dashboard.html" style="text-decoration:none;">
+          <button class="btn btn-primary" type="button">Manager Dashboard</button>
+        </a>
+        <button class="icon-menu-toggle" type="button" aria-label="Open menu">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <span class="hero-anchor" aria-hidden="true">⚓</span>
+    <h2>ANCHOR <em>Career Sustainability Copilot</em></h2>
+    <p class="sub">
+      ANCHOR is an enterprise AI workforce companion that empowers employees with personalized career guidance, continuous learning, financial wellbeing, recognition, workplace support, and trusted enterprise knowledge, powered by responsible AI, verified insights, and secure, human-centered experiences.
+    </p>
+  </section>
+
+  <!-- ===================== FEATURE CHIPS ===================== -->
+  <div class="chip-row">
+    <span class="chip" style="animation-delay: .02s">Career Growth</span>
+    <span class="chip" style="animation-delay: .06s">Recognition</span>
+    <span class="chip" style="animation-delay: .10s">AI Readiness</span>
+    <span class="chip" style="animation-delay: .14s">Financial Wellbeing</span>
+    <span class="chip" style="animation-delay: .18s">Learning</span>
+    <span class="chip" style="animation-delay: .22s">Belonging</span>
+    <span class="chip" style="animation-delay: .26s">Onboarding</span>
+    <span class="chip" style="animation-delay: .30s">Manager Support</span>
+    <span class="chip" style="animation-delay: .34s">Guardrails</span>
+    <span class="chip" style="animation-delay: .38s">Grounded AI</span>
+  </div>
+
+  <!-- ===================== CHAT ===================== -->
+  <main class="chat-shell">
+    <div class="chat-window" id="chat-window">
+      <div class="empty-state" id="empty-state">
+        <div class="icon">⚓</div>
+        <p>Ask ANCHOR anything to begin your conversation.</p>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-shell">
+        <textarea
+          id="chat-input"
+          rows="1"
+          placeholder="Ask ANCHOR anything..."
+          aria-label="Message ANCHOR"
+        ></textarea>
+        <button class="send-btn" id="send-btn" type="button" aria-label="Send message">➤</button>
+      </div>
+      <p class="input-hint">ANCHOR can be inaccurate. Verify important career and financial decisions.</p>
+    </div>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <span class="footer-label">Powered by</span>
+      <span class="power-pill">RAG</span>
+      <span class="power-pill">Multi-Agent</span>
+      <span class="power-pill">Grounded AI</span>
+      <span class="power-pill">Hallucination Detection</span>
+      <span class="power-pill">Audit Logging</span>
+      <span class="power-pill">MCP</span>
+      <span class="power-pill">FastAPI</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ----------------------------------------------------------
+     Agent code → friendly display name
+     (Extend this map if the backend introduces new agents.)
+  ---------------------------------------------------------- */
+  const AGENT_DISPLAY_NAMES = {
+    stability_agent: "Financial Wellbeing Agent",
+    pathways_agent: "Career Growth Agent",
+    skills_agent: "Learning Agent",
+    ai_fluency_agent: "AI Readiness Agent",
+    recognition_agent: "Recognition Agent",
+    belonging_agent: "Belonging Agent",
+    early_careers_agent: "Early Careers Agent",
+    guardrail_escalation: "Guardrail Escalation",
+    system: "System"
+  };
+
+  function friendlyAgentName(code){
+    if(!code) return null;
+    return AGENT_DISPLAY_NAMES[code] || code;
+  }
+
+  function isEscalation(code){
+    return code === "guardrail_escalation";
+  }
+
+  /* ----------------------------------------------------------
+     DOM references
+  ---------------------------------------------------------- */
+  const chatWindow = document.getElementById("chat-window");
+  const emptyState = document.getElementById("empty-state");
+  const chatInput = document.getElementById("chat-input");
+  const sendBtn = document.getElementById("send-btn");
+  const newChatBtn = document.getElementById("new-chat-btn");
+
+  const EMPLOYEE_ID = 1;
+
+  // Tracks the active conversation across turns. null = the next message
+  // starts a brand new session on the backend; once the backend returns a
+  // session_id, we remember it and send it back on every subsequent message
+  // so the agent has access to prior turns as conversation history.
+  let currentSessionId = null;
+
+  /* ----------------------------------------------------------
+     Helpers
+  ---------------------------------------------------------- */
+  function scrollToBottom(){
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function removeEmptyState(){
+    if(emptyState && emptyState.parentNode){
+      emptyState.remove();
+    }
+  }
+
+  function autoGrow(){
+    chatInput.style.height = "auto";
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + "px";
+  }
+
+  function appendUserMessage(text){
+    removeEmptyState();
+    const row = document.createElement("div");
+    row.className = "msg-row user";
+    const bubble = document.createElement("div");
+    bubble.className = "bubble user";
+    const textEl = document.createElement("div");
+    textEl.className = "bubble-text";
+    textEl.textContent = text;
+    bubble.appendChild(textEl);
+    row.appendChild(bubble);
+    chatWindow.appendChild(row);
+    scrollToBottom();
+  }
+
+  function appendAssistantMessage(data){
+    removeEmptyState();
+    const row = document.createElement("div");
+    row.className = "msg-row assistant";
+
+    const bubble = document.createElement("div");
+    bubble.className = "bubble assistant";
+
+    // Agent badge
+    const agentCode = data && data.agent ? data.agent : null;
+    if(agentCode){
+      const badge = document.createElement("span");
+      badge.className = "agent-badge" + (isEscalation(agentCode) ? " escalation" : "");
+      const dot = document.createElement("span");
+      dot.className = "dot";
+      badge.appendChild(dot);
+      badge.appendChild(document.createTextNode(friendlyAgentName(agentCode)));
+      bubble.appendChild(badge);
+      bubble.appendChild(document.createElement("br"));
+    }
+
+    // Reply text
+    const textEl = document.createElement("div");
+    textEl.className = "bubble-text";
+    textEl.textContent = (data && data.reply) ? data.reply : "No response received.";
+    bubble.appendChild(textEl);
+
+    // Sources
+    const sources = data && Array.isArray(data.sources) ? data.sources : [];
+    if(sources.length > 0){
+      const sourceRow = document.createElement("div");
+      sourceRow.className = "source-row";
+      const label = document.createElement("div");
+      label.className = "source-label";
+      label.textContent = "Sources";
+      sourceRow.appendChild(label);
+      sources.forEach(function(src){
+        const badge = document.createElement("span");
+        badge.className = "source-badge";
+        badge.textContent = "📄 " + src;
+        sourceRow.appendChild(badge);
+      });
+      bubble.appendChild(sourceRow);
+    }
+
+    row.appendChild(bubble);
+    chatWindow.appendChild(row);
+    scrollToBottom();
+  }
+
+  function showThinking(){
+    const row = document.createElement("div");
+    row.className = "thinking-row";
+    row.id = "thinking-indicator";
+    const bubble = document.createElement("div");
+    bubble.className = "thinking-bubble";
+    bubble.innerHTML =
+      "ANCHOR is thinking" +
+      '<span class="dots"><span></span><span></span><span></span></span>';
+    row.appendChild(bubble);
+    chatWindow.appendChild(row);
+    scrollToBottom();
+  }
+
+  function removeThinking(){
+    const el = document.getElementById("thinking-indicator");
+    if(el) el.remove();
+  }
+
+  function appendErrorMessage(message){
+    removeEmptyState();
+    const row = document.createElement("div");
+    row.className = "msg-row assistant";
+    const bubble = document.createElement("div");
+    bubble.className = "bubble assistant";
+    const badge = document.createElement("span");
+    badge.className = "agent-badge escalation";
+    const dot = document.createElement("span");
+    dot.className = "dot";
+    badge.appendChild(dot);
+    badge.appendChild(document.createTextNode("Connection Issue"));
+    bubble.appendChild(badge);
+    bubble.appendChild(document.createElement("br"));
+    const textEl = document.createElement("div");
+    textEl.className = "bubble-text";
+    textEl.textContent = message;
+    bubble.appendChild(textEl);
+    row.appendChild(bubble);
+    chatWindow.appendChild(row);
+    scrollToBottom();
+  }
+
+  /* ----------------------------------------------------------
+     Backend call — now session-aware for multi-turn memory.
+  ---------------------------------------------------------- */
+  async function sendMessage(){
+    const message = chatInput.value.trim();
+    if(!message) return;
+
+    appendUserMessage(message);
+    chatInput.value = "";
+    autoGrow();
+    sendBtn.disabled = true;
+    showThinking();
+
+    try{
+      const requestBody = {
+        employee_id: EMPLOYEE_ID,
+        message: message
+      };
+      // Only include session_id once we have one - its absence tells the
+      // backend to start a brand new conversation.
+      if (currentSessionId) {
+        requestBody.session_id = currentSessionId;
+      }
+
+      const response = await fetch("/api/v1/chat/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+      });
+
+      if(!response.ok){
+        throw new Error("Request failed with status " + response.status);
+      }
+
+      const data = await response.json();
+
+      // Remember the session_id the backend assigned/confirmed so the next
+      // message in this conversation continues the same thread.
+      if (data && data.session_id) {
+        currentSessionId = data.session_id;
+      }
+
+      removeThinking();
+      appendAssistantMessage(data);
+
+    } catch(err){
+      removeThinking();
+      appendErrorMessage(
+        "ANCHOR couldn't reach the backend service. Please try again in a moment."
+      );
+      console.error("ANCHOR chat error:", err);
+    } finally{
+      sendBtn.disabled = false;
+      chatInput.focus();
+    }
+  }
+
+  /* ----------------------------------------------------------
+     Start a fresh conversation - clears the chat window and
+     resets the session so the next message begins a new thread.
+  ---------------------------------------------------------- */
+  function startNewChat(){
+    currentSessionId = null;
+    chatWindow.innerHTML = "";
+    const fresh = document.createElement("div");
+    fresh.className = "empty-state";
+    fresh.id = "empty-state";
+    fresh.innerHTML = '<div class="icon">⚓</div><p>Ask ANCHOR anything to begin your conversation.</p>';
+    chatWindow.appendChild(fresh);
+  }
+
+  /* ----------------------------------------------------------
+     Event wiring
+  ---------------------------------------------------------- */
+  sendBtn.addEventListener("click", sendMessage);
+
+  chatInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter" && !e.shiftKey){
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  chatInput.addEventListener("input", autoGrow);
+
+  if (newChatBtn) {
+    newChatBtn.addEventListener("click", startNewChat);
+  }
+
+  // Feature chips: clicking one drops its topic into the input box.
+  document.querySelectorAll(".chip").forEach(function(chip){
+    chip.addEventListener("click", function(){
+      chatInput.value = "Tell me about " + chip.textContent.trim();
+      autoGrow();
+      chatInput.focus();
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

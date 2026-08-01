@@ -1,0 +1,25 @@
+{
+  "test_cases": [
+    {"message": "I am stressed about my finances and cost of living", "expected_intent": "stability", "expected_source": "stability.md"},
+    {"message": "How do I request a wage advance if I am struggling?", "expected_intent": "stability", "expected_source": "stability.md"},
+    {"message": "What financial support does the company offer during emergencies?", "expected_intent": "stability", "expected_source": "stability.md"},
+    {"message": "I want to grow into a leadership role but don't know how", "expected_intent": "pathways", "expected_source": "pathways.md"},
+    {"message": "How do promotions work here?", "expected_intent": "pathways", "expected_source": "pathways.md"},
+    {"message": "Can I switch to a different department internally?", "expected_intent": "pathways", "expected_source": "pathways.md"},
+    {"message": "I need to learn new skills to stay relevant", "expected_intent": "skills", "expected_source": "skills.md"},
+    {"message": "Does the company pay for certifications?", "expected_intent": "skills", "expected_source": "skills.md"},
+    {"message": "Is there a mentorship program available?", "expected_intent": "skills", "expected_source": "skills.md"},
+    {"message": "Will AI replace my job?", "expected_intent": "ai_fluency", "expected_source": "ai_fluency.md"},
+    {"message": "I feel behind on AI tools everyone else uses", "expected_intent": "ai_fluency", "expected_source": "ai_fluency.md"},
+    {"message": "What AI tools am I allowed to use for work?", "expected_intent": "ai_fluency", "expected_source": "ai_fluency.md"},
+    {"message": "I feel like my work goes unnoticed and I am burning out", "expected_intent": "recognition", "expected_source": "recognition.md"},
+    {"message": "How can I get recognized for my contributions?", "expected_intent": "recognition", "expected_source": "recognition.md"},
+    {"message": "Is there mental health support available at work?", "expected_intent": "recognition", "expected_source": "recognition.md"},
+    {"message": "I don't feel like I belong on my team", "expected_intent": "belonging", "expected_source": "belonging.md"},
+    {"message": "Are there employee resource groups I can join?", "expected_intent": "belonging", "expected_source": "belonging.md"},
+    {"message": "How does the company support remote employees feeling connected?", "expected_intent": "belonging", "expected_source": "belonging.md"},
+    {"message": "I just started this job and feel completely lost", "expected_intent": "early_careers", "expected_source": "early_careers.md"},
+    {"message": "What does onboarding look like here?", "expected_intent": "early_careers", "expected_source": "early_careers.md"},
+    {"message": "Is it normal to feel unproductive in my first few months?", "expected_intent": "early_careers", "expected_source": "early_careers.md"}
+  ]
+}
