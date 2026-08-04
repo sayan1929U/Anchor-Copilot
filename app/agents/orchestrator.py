@@ -1,6 +1,4 @@
-from groq import Groq
 from sqlalchemy.orm import Session
-from app.config import settings
 from app.agents.base import AgentResponse
 from app.agents.specialists import (
     stability_agent, pathways_agent, skills_agent, ai_fluency_agent,
@@ -11,10 +9,9 @@ from app.core.hallucination_check import check_grounding
 from app.core.retrieval import retrieve_chunks
 from app.core.nudges import evaluate_nudge
 from app.core.memory import get_recent_history
+from app.core.groq_client import safe_groq_call, FALLBACK_MESSAGE
 from app.models.agent_log import AgentAuditLog
 from app.models.manager_nudge import ManagerNudge
-
-client = Groq(api_key=settings.groq_api_key)
 
 VALID_INTENTS = [
     "stability", "pathways", "skills", "ai_fluency",
@@ -46,8 +43,8 @@ Respond with ONLY the category label - lowercase, no punctuation, no explanation
 """
 
 
-def classify_intent(message: str) -> str:
-    response = client.chat.completions.create(
+def classify_intent(message: str) -> str | None:
+    response = safe_groq_call(
         model="llama-3.3-70b-versatile",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -56,6 +53,9 @@ def classify_intent(message: str) -> str:
         temperature=0,
         max_tokens=10,
     )
+    if response is None:
+        return None
+
     raw = response.choices[0].message.content or ""
     label = raw.strip().lower().strip(".").strip()
 
@@ -83,10 +83,12 @@ def route(message: str, db: Session, session_id: int, employee_id: int) -> Agent
         )
 
     intent = classify_intent(message)
-    agent_fn = AGENT_DISPATCH[intent]
 
-    # Pull recent history BEFORE this message was logged, so the agent sees
-    # prior turns as context, not including the current message twice
+    if intent is None:
+        _log(db, session_id, "orchestrator", "failed", "Groq API unreachable during intent classification")
+        return AgentResponse(agent_name="system", content=FALLBACK_MESSAGE, intent="system_error")
+
+    agent_fn = AGENT_DISPATCH[intent]
     history = get_recent_history(db, session_id, limit=6)
 
     result = agent_fn(message, history)

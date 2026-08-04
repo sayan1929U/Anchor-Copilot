@@ -1,36 +1,43 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.database import get_db
 from app.models.conversation import ConversationSession, Message
+from app.models.employee import Employee
 from app.agents.orchestrator import route
+from app.core.auth_deps import get_current_employee
+from app.core.rate_limit import limiter
 
 router = APIRouter()
 
 class ChatRequest(BaseModel):
-    employee_id: int
     message: str
     session_id: int | None = None
 
 @router.post("/")
-def chat(request: ChatRequest, db: Session = Depends(get_db)):
-    if request.session_id:
+@limiter.limit("20/minute")
+def chat(
+    request: Request,
+    body: ChatRequest,
+    db: Session = Depends(get_db),
+    current_employee: Employee = Depends(get_current_employee),
+):
+    if body.session_id:
         session = db.query(ConversationSession).filter(
-            ConversationSession.id == request.session_id,
-            ConversationSession.employee_id == request.employee_id,
+            ConversationSession.id == body.session_id,
+            ConversationSession.employee_id == current_employee.id,
         ).first()
         if not session:
             raise HTTPException(status_code=404, detail="Session not found for this employee")
     else:
-        session = ConversationSession(employee_id=request.employee_id)
+        session = ConversationSession(employee_id=current_employee.id)
         db.add(session)
         db.commit()
         db.refresh(session)
 
-    # route() pulls history internally BEFORE we log this message, avoiding duplication
-    result = route(request.message, db, session.id, request.employee_id)
+    result = route(body.message, db, session.id, current_employee.id)
 
-    user_msg = Message(session_id=session.id, role="user", content=request.message)
+    user_msg = Message(session_id=session.id, role="user", content=body.message)
     db.add(user_msg)
 
     agent_msg = Message(

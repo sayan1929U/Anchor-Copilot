@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANCHOR — Career Sustainability Copilot</title>
 <style>
-  
-
   :root{
     --bg: #FAF9F6;
     --navy: #0D1B2A;
@@ -15,6 +13,8 @@
     --border: #E0DDD6;
     --card: #FFFFFF;
     --text-muted: #5B6470;
+    --danger: #B3413A;
+    --danger-light: #FBEAEA;
     --radius-lg: 20px;
     --radius-md: 14px;
     --radius-sm: 10px;
@@ -48,14 +48,13 @@
   button{ font-family: inherit; cursor: pointer; }
   :focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
 
-  
   .app{
     min-height: 100vh;
-    display: flex;
+    display: none;
     flex-direction: column;
   }
+  .app.visible{ display: flex; }
 
-  
   header.top-bar{
     position: sticky;
     top: 0;
@@ -117,6 +116,10 @@
     font-weight: 500;
     transition: all .18s ease;
     white-space: nowrap;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
   .btn:hover{
     border-color: var(--accent);
@@ -143,6 +146,14 @@
     color: var(--navy);
     background: var(--accent-light);
   }
+  .btn-danger-ghost{
+    background: transparent;
+    border-color: transparent;
+    color: var(--danger);
+  }
+  .btn-danger-ghost:hover{
+    background: var(--danger-light);
+  }
 
   .icon-menu-toggle{
     display: none;
@@ -154,7 +165,6 @@
     justify-content: center;
   }
 
-  /* ---------------- Hero / Welcome ---------------- */
   .hero{
     max-width: 880px;
     margin: 56px auto 40px;
@@ -192,7 +202,6 @@
     to{ opacity: 1; transform: translateY(0) scale(1); }
   }
 
-
   .chip-row{
     max-width: 980px;
     margin: 0 auto 44px;
@@ -226,7 +235,6 @@
     to{ opacity: 1; transform: translateY(0); }
   }
 
- 
   main.chat-shell{
     flex: 1;
     width: 100%;
@@ -298,8 +306,8 @@
     margin-bottom: 12px;
   }
   .agent-badge.escalation{
-    background: #FBEAEA;
-    color: #B3413A;
+    background: var(--danger-light);
+    color: var(--danger);
   }
   .agent-badge .dot{
     width: 6px; height: 6px;
@@ -343,7 +351,6 @@
     background: var(--accent-light);
   }
 
-  /* Thinking indicator */
   .thinking-row{ display: flex; justify-content: flex-start; }
   .thinking-bubble{
     display: flex;
@@ -371,7 +378,6 @@
     40%{ transform: scale(1); opacity: 1; }
   }
 
-  /* Empty state */
   .empty-state{
     margin: auto;
     text-align: center;
@@ -381,7 +387,6 @@
   .empty-state .icon{ font-size: 30px; margin-bottom: 10px; opacity: 0.6; }
   .empty-state p{ font-size: 14px; margin: 0; }
 
-  
   .input-bar{
     position: sticky;
     bottom: 0;
@@ -445,7 +450,6 @@
     margin-top: 8px;
   }
 
-  /* ---------------- Footer ---------------- */
   footer.app-footer{
     border-top: 1px solid var(--border);
     padding: 18px 28px 22px;
@@ -474,7 +478,199 @@
     border-radius: 999px;
   }
 
-  /* ---------------- Responsive ---------------- */
+  .modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 27, 42, 0.45);
+    backdrop-filter: blur(3px);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 64px 20px;
+    z-index: 100;
+    overflow-y: auto;
+  }
+  .modal-overlay.open{ display: flex; }
+  .modal-card{
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    max-width: 640px;
+    width: 100%;
+    box-shadow: var(--shadow-lift);
+    animation: msgIn .3s cubic-bezier(.2,.8,.2,1) both;
+    overflow: hidden;
+  }
+  .modal-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 26px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-head h3{
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .modal-close{
+    border: none;
+    background: var(--accent-light);
+    color: var(--navy);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .modal-close:hover{ background: var(--border); }
+  .modal-body{
+    padding: 24px 26px 28px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--navy);
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .modal-body p{ margin: 0 0 14px; }
+  .modal-body p:last-child{ margin-bottom: 0; }
+  .modal-body h4{
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin: 20px 0 8px;
+  }
+  .modal-body h4:first-child{ margin-top: 0; }
+  .modal-body ul{ margin: 0 0 14px; padding-left: 20px; }
+  .modal-body li{ margin-bottom: 6px; }
+  .modal-body code{
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 5px;
+    font-size: 13px;
+  }
+
+  /* ---------------- Auth gate ---------------- */
+  #auth-gate{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .auth-card{
+    width: 100%;
+    max-width: 400px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lift);
+    padding: 36px 34px 30px;
+    animation: msgIn .4s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .auth-brand{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 26px;
+  }
+  .auth-brand .brand-icon{ margin-bottom: 12px; width: 52px; height: 52px; font-size: 24px; }
+  .auth-brand h1{
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .auth-brand p{
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .auth-tabs{
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 22px;
+  }
+  .auth-tab{
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 9px 0;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all .18s ease;
+  }
+  .auth-tab.active{
+    background: var(--navy);
+    color: #fff;
+    box-shadow: var(--shadow-soft);
+  }
+  .auth-field{ margin-bottom: 14px; }
+  .auth-field label{
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .auth-field input{
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14.5px;
+    font-family: inherit;
+    color: var(--navy);
+    outline: none;
+    transition: border-color .18s ease;
+  }
+  .auth-field input:focus{ border-color: var(--accent); }
+  .auth-submit{
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--navy);
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 600;
+    margin-top: 6px;
+    transition: all .18s ease;
+  }
+  .auth-submit:hover:not(:disabled){ background: var(--accent); }
+  .auth-submit:disabled{ opacity: 0.5; cursor: not-allowed; }
+  .auth-error{
+    background: var(--danger-light);
+    color: var(--danger);
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 14px;
+    display: none;
+  }
+  .auth-error.visible{ display: block; }
+  .auth-hint{
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 18px;
+  }
+  .auth-form{ display: none; }
+  .auth-form.active{ display: block; }
+
   @media (max-width: 780px){
     nav.top-actions .btn:not(.btn-primary){ display: none; }
     .icon-menu-toggle{ display: flex; }
@@ -490,32 +686,83 @@
 </style>
 </head>
 <body>
-<div class="app">
 
-  <!-- ===================== HEADER ===================== -->
+<!-- ===================== AUTH GATE ===================== -->
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="brand-icon">⚓</div>
+      <h1>ANCHOR</h1>
+      <p>Career Sustainability Copilot</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" type="button">Log In</button>
+      <button class="auth-tab" id="tab-register" type="button">Register</button>
+    </div>
+
+    <div class="auth-error" id="auth-error"></div>
+
+    <!-- Login form -->
+    <form class="auth-form active" id="login-form">
+      <div class="auth-field">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required autocomplete="email" />
+      </div>
+      <div class="auth-field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required autocomplete="current-password" />
+      </div>
+      <button type="submit" class="auth-submit" id="login-submit">Log In</button>
+    </form>
+
+    <!-- Register form -->
+    <form class="auth-form" id="register-form">
+      <div class="auth-field">
+        <label for="register-name">Full Name</label>
+        <input type="text" id="register-name" required autocomplete="name" />
+      </div>
+      <div class="auth-field">
+        <label for="register-email">Email</label>
+        <input type="email" id="register-email" required autocomplete="email" />
+      </div>
+      <div class="auth-field">
+        <label for="register-password">Password</label>
+        <input type="password" id="register-password" required minlength="8" autocomplete="new-password" />
+      </div>
+      <button type="submit" class="auth-submit" id="register-submit">Create Account</button>
+    </form>
+
+    <p class="auth-hint">Your conversation is private and grounded in verified company policy and workforce research.</p>
+  </div>
+</div>
+
+<!-- ===================== MAIN APP (hidden until authenticated) ===================== -->
+<div class="app" id="app">
+
   <header class="top-bar">
     <div class="top-bar-inner">
       <div class="brand">
         <div class="brand-icon">⚓</div>
         <div class="brand-text">
           <h1>ANCHOR</h1>
-          <p>Enterprise Multi-Agent AI Assistant</p>
+          <p id="welcome-line">Enterprise Multi-Agent AI Assistant</p>
         </div>
       </div>
       <nav class="top-actions" aria-label="Primary">
-        <button class="btn btn-ghost" type="button">About</button>
-        <button class="btn btn-ghost" type="button">Documentation</button>
-        <button class="btn btn-ghost" type="button">GitHub</button>
+        <button class="btn btn-ghost" type="button" id="about-btn">About</button>
+        <button class="btn btn-ghost" type="button" id="docs-btn">Documentation</button>
+        <a class="btn btn-ghost" href="https://github.com/sayan1929U/Anchor-Copilot" target="_blank" rel="noopener">GitHub</a>
         <button class="btn btn-ghost" id="new-chat-btn" type="button">+ New Chat</button>
         <a href="/dashboard.html" style="text-decoration:none;">
           <button class="btn btn-primary" type="button">Manager Dashboard</button>
         </a>
+        <button class="btn btn-danger-ghost" id="logout-btn" type="button">Log Out</button>
         <button class="icon-menu-toggle" type="button" aria-label="Open menu">☰</button>
       </nav>
     </div>
   </header>
 
-  <!-- ===================== HERO ===================== -->
   <section class="hero">
     <span class="hero-anchor" aria-hidden="true">⚓</span>
     <h2>ANCHOR <em>Career Sustainability Copilot</em></h2>
@@ -524,7 +771,6 @@
     </p>
   </section>
 
-  <!-- ===================== FEATURE CHIPS ===================== -->
   <div class="chip-row">
     <span class="chip" style="animation-delay: .02s">Career Growth</span>
     <span class="chip" style="animation-delay: .06s">Recognition</span>
@@ -538,7 +784,6 @@
     <span class="chip" style="animation-delay: .38s">Grounded AI</span>
   </div>
 
-  <!-- ===================== CHAT ===================== -->
   <main class="chat-shell">
     <div class="chat-window" id="chat-window">
       <div class="empty-state" id="empty-state">
@@ -561,7 +806,6 @@
     </div>
   </main>
 
-  <!-- ===================== FOOTER ===================== -->
   <footer class="app-footer">
     <div class="footer-inner">
       <span class="footer-label">Powered by</span>
@@ -570,21 +814,101 @@
       <span class="power-pill">Grounded AI</span>
       <span class="power-pill">Hallucination Detection</span>
       <span class="power-pill">Audit Logging</span>
-      <span class="power-pill">MCP</span>
+      <span class="power-pill">JWT Auth</span>
       <span class="power-pill">FastAPI</span>
     </div>
   </footer>
 
 </div>
 
+<div class="modal-overlay" id="about-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>About ANCHOR</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>
+        ANCHOR is a multi-agent RAG copilot built around a question raised by Deloitte's
+        2026 Gen Z &amp; Millennial Survey: today's early-career workforce is ambitious but
+        anxious, navigating financial pressure, skill gaps, and uncertainty about AI, while
+        wanting workplaces built around stability, growth, and purpose.
+      </p>
+      <p>
+        Rather than one generic chatbot, ANCHOR routes every question to one of seven
+        specialist agents, each focused on a single domain drawn directly from the survey's
+        own chapters: financial stability, career pathways, skills, AI readiness, recognition,
+        belonging, and early-career onboarding.
+      </p>
+      <h4>How it stays honest</h4>
+      <p>
+        Every specialist agent answers only from retrieved company policy and primary Deloitte
+        research, never from memory alone. A deterministic grounding check verifies that any
+        specific number or named policy in a response actually appears in what was retrieved,
+        and a separate guardrail watches for signs of real distress and routes straight to
+        crisis resources instead of letting an agent improvise.
+      </p>
+      <h4>Built by</h4>
+      <p>
+        Sayan Dey — B.Tech CSE (AI &amp; ML), Brainware University. Source and write-up on
+        <a href="https://github.com/sayan1929U/Anchor-Copilot" target="_blank" rel="noopener">GitHub</a>.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="docs-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>Documentation</h3>
+      <button class="modal-close" data-close-modal>&times;</button>
+    </div>
+    <div class="modal-body">
+      <h4>Architecture</h4>
+      <p>
+        Employee message → Orchestrator Agent (intent classification) → one of seven
+        specialist agents → shared pgvector store (RAG retrieval) → grounded response
+        generation → deterministic hallucination check → audit log + optional manager
+        nudge → reply.
+      </p>
+      <h4>The seven agents</h4>
+      <ul>
+        <li><strong>Stability</strong> — pay, cost of living, financial hardship policy</li>
+        <li><strong>Pathways</strong> — promotion, leadership, career growth</li>
+        <li><strong>Skills</strong> — learning, upskilling, certifications</li>
+        <li><strong>AI-Fluency</strong> — AI tools, readiness, job-security concerns</li>
+        <li><strong>Recognition</strong> — wellbeing, burnout, being seen at work</li>
+        <li><strong>Belonging</strong> — purpose, culture, connection</li>
+        <li><strong>Early-Careers</strong> — onboarding, first 90 days</li>
+      </ul>
+      <h4>Authentication</h4>
+      <p>
+        <code>POST /api/v1/auth/register</code> and <code>POST /api/v1/auth/login</code> issue
+        a JWT. Every request to <code>/api/v1/chat/</code> and <code>/api/v1/audit/*</code>
+        requires <code>Authorization: Bearer &lt;token&gt;</code> — the employee identity is
+        derived entirely from the verified token, never from client-supplied input.
+      </p>
+      <h4>API</h4>
+      <p>
+        <code>POST /api/v1/chat/</code> — send <code>{message, session_id?}</code>.
+        Omit <code>session_id</code> to start a new conversation; include it to continue one
+        with memory of prior turns.
+      </p>
+      <p>
+        <code>GET /api/v1/audit/logs</code> and <code>GET /api/v1/audit/nudges</code> are
+        manager-only and power the Manager Dashboard — every routing decision, guardrail
+        action, and manager nudge is logged with a reason, for full auditability.
+      </p>
+      <h4>Stack</h4>
+      <p>FastAPI · PostgreSQL + pgvector · Groq (Llama 3.3 70B) · sentence-transformers (local embeddings) · SQLAlchemy + Alembic · JWT + bcrypt</p>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
 
-  /* ----------------------------------------------------------
-     Agent code → friendly display name
-     (Extend this map if the backend introduces new agents.)
-  ---------------------------------------------------------- */
   const AGENT_DISPLAY_NAMES = {
     stability_agent: "Financial Wellbeing Agent",
     pathways_agent: "Career Growth Agent",
@@ -607,32 +931,162 @@
   }
 
   /* ----------------------------------------------------------
-     DOM references
+     Auth state - kept in memory only (not localStorage), so a
+     stolen/injected script can't silently read a persisted token
+     off disk. Cost: refreshing the page requires logging in again.
+  ---------------------------------------------------------- */
+  let authToken = null;
+  let currentUser = null; // { employee_id, full_name, role }
+  let currentSessionId = null;
+
+  const authGate = document.getElementById("auth-gate");
+  const appEl = document.getElementById("app");
+  const authError = document.getElementById("auth-error");
+
+  const tabLogin = document.getElementById("tab-login");
+  const tabRegister = document.getElementById("tab-register");
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const loginSubmit = document.getElementById("login-submit");
+  const registerSubmit = document.getElementById("register-submit");
+  const welcomeLine = document.getElementById("welcome-line");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  function showAuthError(message){
+    authError.textContent = message;
+    authError.classList.add("visible");
+  }
+  function clearAuthError(){
+    authError.textContent = "";
+    authError.classList.remove("visible");
+  }
+
+  function switchTab(which){
+    clearAuthError();
+    if (which === "login") {
+      tabLogin.classList.add("active");
+      tabRegister.classList.remove("active");
+      loginForm.classList.add("active");
+      registerForm.classList.remove("active");
+    } else {
+      tabRegister.classList.add("active");
+      tabLogin.classList.remove("active");
+      registerForm.classList.add("active");
+      loginForm.classList.remove("active");
+    }
+  }
+  tabLogin.addEventListener("click", function(){ switchTab("login"); });
+  tabRegister.addEventListener("click", function(){ switchTab("register"); });
+
+  function enterApp(){
+    authGate.style.display = "none";
+    appEl.classList.add("visible");
+    welcomeLine.textContent = "Welcome, " + currentUser.full_name + " (" + currentUser.role + ")";
+  }
+
+  function logout(){
+    authToken = null;
+    currentUser = null;
+    currentSessionId = null;
+    appEl.classList.remove("visible");
+    authGate.style.display = "flex";
+    loginForm.reset();
+    registerForm.reset();
+    switchTab("login");
+    startNewChatSilent();
+  }
+  logoutBtn.addEventListener("click", logout);
+
+  loginForm.addEventListener("submit", async function(e){
+    e.preventDefault();
+    clearAuthError();
+    loginSubmit.disabled = true;
+    loginSubmit.textContent = "Logging in...";
+
+    try {
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+
+      const res = await fetch("/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, password: password })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(function(){ return {}; });
+        throw new Error(err.detail || "Login failed.");
+      }
+
+      const data = await res.json();
+      authToken = data.access_token;
+      currentUser = { employee_id: data.employee_id, full_name: data.full_name, role: data.role };
+      enterApp();
+
+    } catch (err) {
+      showAuthError(err.message || "Something went wrong logging in.");
+    } finally {
+      loginSubmit.disabled = false;
+      loginSubmit.textContent = "Log In";
+    }
+  });
+
+  registerForm.addEventListener("submit", async function(e){
+    e.preventDefault();
+    clearAuthError();
+    registerSubmit.disabled = true;
+    registerSubmit.textContent = "Creating account...";
+
+    try {
+      const full_name = document.getElementById("register-name").value.trim();
+      const email = document.getElementById("register-email").value.trim();
+      const password = document.getElementById("register-password").value;
+
+      const res = await fetch("/api/v1/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ full_name: full_name, email: email, password: password })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(function(){ return {}; });
+        throw new Error(err.detail || "Registration failed.");
+      }
+
+      const data = await res.json();
+      authToken = data.access_token;
+      currentUser = { employee_id: data.employee_id, full_name: data.full_name, role: data.role };
+      enterApp();
+
+    } catch (err) {
+      showAuthError(err.message || "Something went wrong creating your account.");
+    } finally {
+      registerSubmit.disabled = false;
+      registerSubmit.textContent = "Create Account";
+    }
+  });
+
+  /* ----------------------------------------------------------
+     Chat DOM references
   ---------------------------------------------------------- */
   const chatWindow = document.getElementById("chat-window");
   const emptyState = document.getElementById("empty-state");
   const chatInput = document.getElementById("chat-input");
   const sendBtn = document.getElementById("send-btn");
   const newChatBtn = document.getElementById("new-chat-btn");
+  const aboutBtn = document.getElementById("about-btn");
+  const docsBtn = document.getElementById("docs-btn");
+  const aboutModal = document.getElementById("about-modal");
+  const docsModal = document.getElementById("docs-modal");
 
-  const EMPLOYEE_ID = 1;
-
-  // Tracks the active conversation across turns. null = the next message
-  // starts a brand new session on the backend; once the backend returns a
-  // session_id, we remember it and send it back on every subsequent message
-  // so the agent has access to prior turns as conversation history.
-  let currentSessionId = null;
-
-  /* ----------------------------------------------------------
-     Helpers
-  ---------------------------------------------------------- */
   function scrollToBottom(){
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
 
   function removeEmptyState(){
-    if(emptyState && emptyState.parentNode){
-      emptyState.remove();
+    const el = document.getElementById("empty-state");
+    if(el && el.parentNode){
+      el.remove();
     }
   }
 
@@ -664,7 +1118,6 @@
     const bubble = document.createElement("div");
     bubble.className = "bubble assistant";
 
-    // Agent badge
     const agentCode = data && data.agent ? data.agent : null;
     if(agentCode){
       const badge = document.createElement("span");
@@ -677,13 +1130,11 @@
       bubble.appendChild(document.createElement("br"));
     }
 
-    // Reply text
     const textEl = document.createElement("div");
     textEl.className = "bubble-text";
     textEl.textContent = (data && data.reply) ? data.reply : "No response received.";
     bubble.appendChild(textEl);
 
-    // Sources
     const sources = data && Array.isArray(data.sources) ? data.sources : [];
     if(sources.length > 0){
       const sourceRow = document.createElement("div");
@@ -748,12 +1199,14 @@
     scrollToBottom();
   }
 
-  /* ----------------------------------------------------------
-     Backend call — now session-aware for multi-turn memory.
-  ---------------------------------------------------------- */
   async function sendMessage(){
     const message = chatInput.value.trim();
     if(!message) return;
+
+    if (!authToken) {
+      logout();
+      return;
+    }
 
     appendUserMessage(message);
     chatInput.value = "";
@@ -762,21 +1215,27 @@
     showThinking();
 
     try{
-      const requestBody = {
-        employee_id: EMPLOYEE_ID,
-        message: message
-      };
-      // Only include session_id once we have one - its absence tells the
-      // backend to start a brand new conversation.
+      const requestBody = { message: message };
       if (currentSessionId) {
         requestBody.session_id = currentSessionId;
       }
 
       const response = await fetch("/api/v1/chat/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + authToken
+        },
         body: JSON.stringify(requestBody)
       });
+
+      if (response.status === 401) {
+        // Token expired or invalid - send the person back to the login gate
+        removeThinking();
+        logout();
+        showAuthError("Your session expired. Please log in again.");
+        return;
+      }
 
       if(!response.ok){
         throw new Error("Request failed with status " + response.status);
@@ -784,8 +1243,6 @@
 
       const data = await response.json();
 
-      // Remember the session_id the backend assigned/confirmed so the next
-      // message in this conversation continues the same thread.
       if (data && data.session_id) {
         currentSessionId = data.session_id;
       }
@@ -805,11 +1262,7 @@
     }
   }
 
-  /* ----------------------------------------------------------
-     Start a fresh conversation - clears the chat window and
-     resets the session so the next message begins a new thread.
-  ---------------------------------------------------------- */
-  function startNewChat(){
+  function startNewChatSilent(){
     currentSessionId = null;
     chatWindow.innerHTML = "";
     const fresh = document.createElement("div");
@@ -819,9 +1272,18 @@
     chatWindow.appendChild(fresh);
   }
 
-  /* ----------------------------------------------------------
-     Event wiring
-  ---------------------------------------------------------- */
+  function startNewChat(){
+    const hasActiveConversation = currentSessionId !== null;
+    if (hasActiveConversation) {
+      const confirmed = window.confirm("Start a new conversation? ANCHOR won't remember this one once you do.");
+      if (!confirmed) return;
+    }
+    startNewChatSilent();
+  }
+
+  function openModal(modal){ modal.classList.add("open"); }
+  function closeModal(modal){ modal.classList.remove("open"); }
+
   sendBtn.addEventListener("click", sendMessage);
 
   chatInput.addEventListener("keydown", function(e){
@@ -833,11 +1295,30 @@
 
   chatInput.addEventListener("input", autoGrow);
 
-  if (newChatBtn) {
-    newChatBtn.addEventListener("click", startNewChat);
-  }
+  if (newChatBtn) newChatBtn.addEventListener("click", startNewChat);
+  if (aboutBtn) aboutBtn.addEventListener("click", function(){ openModal(aboutModal); });
+  if (docsBtn) docsBtn.addEventListener("click", function(){ openModal(docsModal); });
 
-  // Feature chips: clicking one drops its topic into the input box.
+  document.querySelectorAll("[data-close-modal]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      closeModal(btn.closest(".modal-overlay"));
+    });
+  });
+
+  [aboutModal, docsModal].forEach(function(modal){
+    if(!modal) return;
+    modal.addEventListener("click", function(e){
+      if(e.target === modal) closeModal(modal);
+    });
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){
+      closeModal(aboutModal);
+      closeModal(docsModal);
+    }
+  });
+
   document.querySelectorAll(".chip").forEach(function(chip){
     chip.addEventListener("click", function(){
       chatInput.value = "Tell me about " + chip.textContent.trim();

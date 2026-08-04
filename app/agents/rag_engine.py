@@ -1,9 +1,6 @@
-from groq import Groq
-from app.config import settings
 from app.agents.base import AgentResponse
 from app.core.retrieval import retrieve_chunks
-
-client = Groq(api_key=settings.groq_api_key)
+from app.core.groq_client import safe_groq_call, FALLBACK_MESSAGE
 
 
 def _build_context_block(chunks) -> str:
@@ -47,12 +44,16 @@ where relevant (e.g. "as you mentioned earlier...").
         messages.extend(history)
     messages.append({"role": "user", "content": message})
 
-    response = client.chat.completions.create(
+    response = safe_groq_call(
         model="llama-3.3-70b-versatile",
         messages=messages,
         temperature=0.4,
         max_tokens=300,
     )
+
+    if response is None:
+        return AgentResponse(agent_name=agent_name, content=FALLBACK_MESSAGE, sources=[])
+
     content = response.choices[0].message.content or "Let me look into that further with you."
     sources = list({chunk.source for chunk in chunks})
 
