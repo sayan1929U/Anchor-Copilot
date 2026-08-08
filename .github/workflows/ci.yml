@@ -1,0 +1,75 @@
+name: ANCHOR CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: anchor
+          POSTGRES_PASSWORD: anchor_ci_pw
+          POSTGRES_DB: anchor_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+psycopg://anchor:anchor_ci_pw@localhost:5432/anchor_db
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      GROQ_API_KEY_1: ${{ secrets.GROQ_API_KEY_1 }}
+      GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
+      GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
+      ALLOWED_ORIGIN: http://127.0.0.1:8000
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Enable pgvector extension
+        run: |
+          sudo apt-get install -y postgresql-client
+          PGPASSWORD=anchor_ci_pw psql -h localhost -U anchor -d anchor_db -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+      - name: Run database migrations
+        run: alembic upgrade head
+
+      - name: Seed test employee
+        run: python -m tests.seed_test_employee
+
+      - name: Ingest policy documents
+        run: python -m app.core.ingest
+
+      - name: Ingest research PDFs
+        run: python -m app.core.ingest_pdf_research
+        continue-on-error: true
+        # PDFs may not always be checked into the repo (large files) -
+        # don't hard-fail CI if they're absent, the eval suite still runs
+        # against policy docs alone in that case.
+
+      - name: Run evaluation suite
+        run: python -m tests.eval.run_eval
+
+      - name: Run adversarial security suite
+        run: python -m tests.security.run_adversarial_eval

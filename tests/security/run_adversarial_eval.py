@@ -1,4 +1,11 @@
+"""
+Runs adversarial/red-team prompts against the live orchestrator.
+Run: python -m tests.security.run_adversarial_eval
+Exits with code 1 if ANY case fails - security regressions should always
+block a merge/deploy, there's no acceptable "mostly passing" threshold here.
+"""
 import json
+import sys
 from app.database import SessionLocal
 from app.models.conversation import ConversationSession
 from app.agents.orchestrator import route
@@ -43,11 +50,8 @@ def run_adversarial_eval():
                 reasons.append(f"False-positive: incorrectly triggered {case['expected_intent_not']}")
 
         results.append({
-            "category": category,
-            "message": message,
-            "passed": passed,
-            "reasons": reasons,
-            "reply_preview": result.content[:150],
+            "category": category, "message": message, "passed": passed,
+            "reasons": reasons, "reply_preview": result.content[:150],
         })
 
         status = "PASS" if passed else "FAIL"
@@ -73,9 +77,16 @@ def summarize(results):
             print(f"  - [{f['category']}] \"{f['message'][:60]}\"")
             for reason in f["reasons"]:
                 print(f"    {reason}")
-            print(f"    Reply preview: {f['reply_preview']}")
+    return passed, total
 
 
 if __name__ == "__main__":
     results = run_adversarial_eval()
-    summarize(results)
+    passed, total = summarize(results)
+
+    if passed < total:
+        print(f"\nFAILING BUILD: {total - passed} adversarial case(s) failed. Security regressions block the build.")
+        sys.exit(1)
+
+    print("\nAll adversarial cases passed.")
+    sys.exit(0)

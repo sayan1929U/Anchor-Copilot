@@ -5,12 +5,18 @@ Runs the labeled eval set against the live orchestrator and reports:
 - Guardrail block rate (how often the hallucination checker fired)
 
 Run: python -m tests.eval.run_eval
+Exits with code 1 if intent accuracy or grounding rate falls below threshold -
+this is what lets CI actually fail the build on a real regression.
 """
 import json
+import sys
 import time
 from app.database import SessionLocal
 from app.models.conversation import ConversationSession
 from app.agents.orchestrator import route
+
+INTENT_ACCURACY_THRESHOLD = 85.0
+GROUNDING_RATE_THRESHOLD = 85.0
 
 with open("tests/eval/test_cases.json") as f:
     test_cases = json.load(f)["test_cases"]
@@ -25,7 +31,6 @@ def run_eval():
         expected_intent = case["expected_intent"]
         expected_source = case["expected_source"]
 
-        # Create a real session so the orchestrator's audit logging has a valid FK to write against
         session = ConversationSession(employee_id=1)
         db.add(session)
         db.commit()
@@ -71,7 +76,7 @@ def summarize(results):
     print(f"Total test cases:        {total}")
     print(f"Intent accuracy:         {intent_acc:.1f}%")
     print(f"Source grounding rate:   {source_acc:.1f}%")
-    print(f"Guardrail block rate:    {block_rate:.1f}%  (lower is generally better here)")
+    print(f"Guardrail block rate:    {block_rate:.1f}%")
     print(f"Avg latency per request: {avg_latency:.2f}s")
 
     failures = [r for r in results if not (r["intent_correct"] and r["source_correct"] and not r["blocked_by_guardrail"])]
@@ -83,10 +88,20 @@ def summarize(results):
                   f"expected_source={f['expected_source']} got={f['actual_sources']}, "
                   f"blocked={f['blocked_by_guardrail']}")
 
+    return intent_acc, source_acc
+
 
 if __name__ == "__main__":
     results = run_eval()
-    summarize(results)
+    intent_acc, source_acc = summarize(results)
 
     with open("tests/eval/last_run_results.json", "w") as f:
         json.dump(results, f, indent=2, default=str)
+
+    if intent_acc < INTENT_ACCURACY_THRESHOLD or source_acc < GROUNDING_RATE_THRESHOLD:
+        print(f"\nFAILING BUILD: accuracy below threshold "
+              f"(intent {intent_acc:.1f}% / grounding {source_acc:.1f}%, need >= {INTENT_ACCURACY_THRESHOLD}%)")
+        sys.exit(1)
+
+    print("\nEval suite passed threshold.")
+    sys.exit(0)
