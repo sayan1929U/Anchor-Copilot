@@ -4,9 +4,14 @@ content with the matching agent category based on chapter markers, chunks it,
 embeds it, and stores it in document_chunks alongside the policy docs.
 
 Run: python -m app.core.ingest_pdf_research
+
+Note: the source PDFs are gitignored (large binary files) and are not present
+in CI - this script exits cleanly with a message in that case rather than
+crashing, since the eval suite can run against policy docs alone.
 """
 import os
 import re
+import sys
 from pypdf import PdfReader
 from app.database import SessionLocal
 from app.models.document_chunk import DocumentChunk
@@ -14,7 +19,6 @@ from app.core.embeddings import embed_text
 
 PDF_DIR = "data/research_pdfs"
 
-# Maps chapter title keywords (as they appear in the PDF page headers) to your agent categories
 CHAPTER_CATEGORY_MAP = [
     (r"financial pressure|delayed decisions|maybe later", "stability"),
     (r"leadership, reconsidered", "pathways"),
@@ -25,7 +29,6 @@ CHAPTER_CATEGORY_MAP = [
     (r"future they.re preparing|knowledge transfer", "early_careers"),
 ]
 
-# Pages to skip entirely - covers, table of contents, methodology, disclaimers
 SKIP_PATTERNS = [
     r"^table of contents",
     r"^research methodology",
@@ -64,6 +67,12 @@ def chunk_text(text: str, max_chars: int = 500) -> list[str]:
 
 
 def ingest_pdfs():
+    if not os.path.isdir(PDF_DIR):
+        print(f"'{PDF_DIR}' not found - research PDFs are gitignored and not "
+              f"present in this environment. Skipping PDF ingestion; policy "
+              f"docs alone are sufficient for the eval suite to run.")
+        sys.exit(0)
+
     db = SessionLocal()
     total = 0
 
@@ -73,8 +82,7 @@ def ingest_pdfs():
 
         filepath = os.path.join(PDF_DIR, filename)
         reader = PdfReader(filepath)
-
-        current_category = None  # carries over across pages within the same chapter
+        current_category = None
 
         for page in reader.pages:
             page_text = page.extract_text() or ""
@@ -86,7 +94,7 @@ def ingest_pdfs():
                 current_category = detected
 
             if not current_category:
-                continue  # skip pages before the first chapter is detected (cover, intro)
+                continue
 
             for chunk in chunk_text(page_text):
                 vector = embed_text(chunk)
