@@ -1,4 +1,4 @@
-# Deloitte 2026 Gen Z & Millennial Survey � Purpose & Belonging Findings
+# Deloitte 2026 Gen Z & Millennial Survey â€” Purpose & Belonging Findings
 
 According to Deloitte's 2026 Global Gen Z and Millennial Survey, purpose and a strong sense of belonging -
 fostered specifically through workplace friendships - are described as non-negotiable factors in job

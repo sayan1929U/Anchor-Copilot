@@ -1,4 +1,4 @@
-# Deloitte 2026 Gen Z & Millennial Survey � Financial Pressure Findings
+# Deloitte 2026 Gen Z & Millennial Survey â€” Financial Pressure Findings
 
 According to Deloitte's 2026 Global Gen Z and Millennial Survey (22,595 respondents, 44 countries), cost of
 living remains the single biggest concern for both generations for the second consecutive year.

@@ -1,4 +1,4 @@
-# Deloitte 2026 Gen Z & Millennial Survey � Leadership & Career Findings
+# Deloitte 2026 Gen Z & Millennial Survey â€” Leadership & Career Findings
 
 According to Deloitte's 2026 Global Gen Z and Millennial Survey, only 6% of Gen Zs and millennials say
 reaching a leadership position is their primary career goal - but this does not mean disengagement.

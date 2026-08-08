@@ -1,4 +1,4 @@
-# Deloitte 2026 Gen Z & Millennial Survey � Learning & Adaptability Findings
+# Deloitte 2026 Gen Z & Millennial Survey â€” Learning & Adaptability Findings
 
 According to Deloitte's 2026 Global Gen Z and Millennial Survey, continuous learning has become a core
 career strategy for both generations, prioritized alongside stability and well-being over fast-paced

@@ -1,4 +1,4 @@
-# Deloitte 2026 Gen Z & Millennial Survey � Early Careers & Knowledge Transfer Findings
+# Deloitte 2026 Gen Z & Millennial Survey â€” Early Careers & Knowledge Transfer Findings
 
 According to Deloitte's 2026 Global Gen Z and Millennial Survey, AI is reshaping entry-level work in ways
 employees see as largely positive: respondents cite AI enabling entry-level employees to gain experience

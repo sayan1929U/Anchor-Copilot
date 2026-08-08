@@ -10,8 +10,20 @@ from app.core.embeddings import embed_text
 DOCS_DIR = "data/policy_docs"
 
 
+def read_text_file(filepath: str) -> str:
+    """Reads a text file, trying UTF-8 first and falling back to cp1252 -
+    Windows editors sometimes save smart quotes/em-dashes in cp1252 even
+    when the file is otherwise plain text, which breaks strict UTF-8
+    decoding on Linux (e.g. GitHub Actions runners)."""
+    with open(filepath, "rb") as f:
+        raw_bytes = f.read()
+    try:
+        return raw_bytes.decode("utf-8")
+    except UnicodeDecodeError:
+        return raw_bytes.decode("cp1252")
+
+
 def chunk_text(text: str, max_chars: int = 400) -> list[str]:
-    """Naive paragraph-based chunking - splits on blank lines, merges short ones up to max_chars."""
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
     chunks = []
     current = ""
@@ -29,8 +41,6 @@ def chunk_text(text: str, max_chars: int = 400) -> list[str]:
 
 def ingest():
     db = SessionLocal()
-
-    # Clear existing chunks so re-running this script doesn't duplicate data
     db.query(DocumentChunk).delete()
     db.commit()
 
@@ -41,9 +51,7 @@ def ingest():
 
         category = filename.replace(".md", "")
         filepath = os.path.join(DOCS_DIR, filename)
-
-        with open(filepath, "r", encoding="utf-8") as f:
-            raw_text = f.read()
+        raw_text = read_text_file(filepath)
 
         chunks = chunk_text(raw_text)
 

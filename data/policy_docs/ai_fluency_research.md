@@ -1,4 +1,4 @@
-# Deloitte 2026 Gen Z & Millennial Survey � AI & the Readiness Gap Findings
+# Deloitte 2026 Gen Z & Millennial Survey â€” AI & the Readiness Gap Findings
 
 According to Deloitte's 2026 Global Gen Z and Millennial Survey, AI adoption is now mainstream: 74% of
 both Gen Zs and millennials report using AI in their day-to-day work, a sharp increase from 57% of Gen Zs
