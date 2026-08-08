@@ -63,10 +63,6 @@ jobs:
 
       - name: Ingest research PDFs
         run: python -m app.core.ingest_pdf_research
-        continue-on-error: true
-        # PDFs may not always be checked into the repo (large files) -
-        # don't hard-fail CI if they're absent, the eval suite still runs
-        # against policy docs alone in that case.
 
       - name: Run evaluation suite
         run: python -m tests.eval.run_eval
